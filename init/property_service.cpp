@@ -1049,12 +1049,24 @@ static void ProcessKernelDt() {
 static void ProcessKernelCmdline() {
     bool for_emulator = false;
     ImportKernelCmdline([&](const std::string& key, const std::string& value) {
-        if (key == "qemu") {
+        if (key == "androidboot.verifiedbootstate" ||
+                key == "androidboot.veritymode" ||
+                key == "androidboot.warranty_bit") {
+            return;
+        } else if (key == "qemu") {
             for_emulator = true;
         } else if (StartsWith(key, "androidboot.")) {
             InitPropertySet("ro.boot." + key.substr(12), value);
         }
     });
+
+    // Lets set some stuff
+    InitPropertySet("ro.boot.flash.locked", "1");
+    InitPropertySet("ro.boot.vbmeta.device_state", "locked");
+    InitPropertySet("ro.boot.verifiedbootstate", "green");
+    InitPropertySet("ro.boot.veritymode", "enforcing");
+    InitPropertySet("ro.boot.warranty_bit", "0");
+    InitPropertySet("ro.warranty_bit", "0");
 
     if (for_emulator) {
         ImportKernelCmdline([&](const std::string& key, const std::string& value) {
