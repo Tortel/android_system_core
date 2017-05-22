@@ -1047,7 +1047,11 @@ static void ProcessKernelDt() {
 static void ProcessKernelCmdline() {
     bool for_emulator = false;
     ImportKernelCmdline([&](const std::string& key, const std::string& value) {
-        if (key == "qemu") {
+        if (key == "androidboot.verifiedbootstate" ||
+                key == "androidboot.veritymode" ||
+                key == "androidboot.warranty_bit") {
+            return;
+        } else if (key == "qemu") {
             for_emulator = true;
         } else if (StartsWith(key, "androidboot.")) {
             InitPropertySet("ro.boot." + key.substr(12), value);
